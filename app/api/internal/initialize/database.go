@@ -32,7 +32,7 @@ func setupMysql() {
 	if err != nil {
 		global.Logger.Fatal("connect to mysql failed," + err.Error())
 	}
-	global.MDb = db
+	global.MDB = db
 	global.Logger.Info("init mysql success")
 }
 

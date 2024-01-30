@@ -27,11 +27,11 @@ func Register(user *model.ParamRegisterUser) error {
 		return consts.UserExistError
 	}
 	password := utils.CryptoPassword(user.Password)
-	err = mysql.AddUser(user.Username, password)
+	err = mysql.AddUser(user.Username, user.Nickname, password, user.Email)
 	if err != nil {
 		return err
 	}
-	err = redis.AddUser(user.Username, password)
+	err = redis.AddUser(user.Username, user.Nickname, password, user.Email)
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,7 @@ database:
     port: 3306
     username: root
     password: zzrr2005
-    db: test
+    db: chat
     charset: utf8mb4
     conn_max_lifetime: 1h
     conn_max_idle_time: 1h

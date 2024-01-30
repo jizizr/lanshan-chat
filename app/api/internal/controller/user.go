@@ -3,6 +3,8 @@ package controller
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"lanshan_chat/app/api/global"
 	"lanshan_chat/app/api/internal/consts"
 	"lanshan_chat/app/api/internal/model"
 	"lanshan_chat/app/api/internal/service"
@@ -10,8 +12,8 @@ import (
 )
 
 func Register(c *gin.Context) {
-	var u *model.ParamRegisterUser
-	if err := c.ShouldBindJSON(u); err != nil {
+	u := new(model.ParamRegisterUser)
+	if err := c.ShouldBind(u); err != nil {
 		RespFailed(c, 400, consts.CodeShouldBind)
 		return
 	}
@@ -29,7 +31,8 @@ func Register(c *gin.Context) {
 			return
 		}
 		RespFailed(c, 500, consts.CodeDBCheckUser)
+		global.Logger.Error("register failed", zap.Error(err))
+		return
 	}
 	RespSuccess(c, nil)
-
 }

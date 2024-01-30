@@ -2,12 +2,11 @@ package mysql
 
 import (
 	"lanshan_chat/app/api/global"
-	"lanshan_chat/app/api/internal/model"
 )
 
 const (
 	CountUserByUsernameStr = "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)"
-	AddUserStr             = "INSERT INTO users(username,password,email) VALUES (?, ?, ?)"
+	AddUserStr             = "INSERT INTO users(username,nickname,password,email) VALUES (?, ?, ?, ?)"
 )
 
 // CheckUserIsExist 如果用户存在返回 true，否则返回 false
@@ -17,7 +16,7 @@ func CheckUserIsExist(username string) (flag bool, err error) {
 	return
 }
 
-func AddUser(u *model.ParamRegisterUser) error {
-	_, err := global.MDB.Exec(AddUserStr, u.Username, u.Password, u.Email)
+func AddUser(username, nickname, password, email string) error {
+	_, err := global.MDB.Exec(AddUserStr, username, nickname, password, email)
 	return err
 }
