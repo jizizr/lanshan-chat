@@ -6,16 +6,16 @@ import (
 )
 
 const (
-	CountUserByUsernameStr     = "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)"
-	AddUserStr                 = "INSERT INTO users(username,nickname,password,email,profile) VALUES (?, ?, ?, ?, ?)"
-	QueryPasswordByUsernameStr = "SELECT uid,password FROM users WHERE username = ?"
-	QueryUserByEmailStr        = "SELECT uid,password FROM users WHERE email = ?"
+	CheckUserExistByUsernameStr = "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)"
+	AddUserStr                  = "INSERT INTO users(username,nickname,password,email,profile) VALUES (?, ?, ?, ?, ?)"
+	QueryPasswordByUsernameStr  = "SELECT user_id,password FROM users WHERE username = ?"
+	QueryUserByEmailStr         = "SELECT user_id,password FROM users WHERE email = ?"
 )
 
 // CheckUserIsExist 如果用户存在返回 true，否则返回 false
 // 如果数据库操作出错返回 error
 func CheckUserIsExist(username string) (flag bool, err error) {
-	err = global.MDB.Get(&flag, CountUserByUsernameStr, username)
+	err = global.MDB.Get(&flag, CheckUserExistByUsernameStr, username)
 	return
 }
 

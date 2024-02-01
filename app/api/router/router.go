@@ -21,7 +21,7 @@ func InitRouter() error {
 	private := r.Group("")
 	private.Use(middleware.JwtAuth)
 	{
-
+		private.POST("/friend", controller.AddFriend)
 	}
 	err := r.Run(":8080")
 	if err != nil {

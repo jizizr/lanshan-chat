@@ -4,14 +4,13 @@ import (
 	"context"
 	"fmt"
 	"lanshan_chat/app/api/global"
-	"lanshan_chat/app/api/internal/consts"
 	"time"
 )
 
-func CheckUserIsExist(username string) (bool, error) {
+func CheckFriendIsExist(userID, friendID int64) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
-	key := fmt.Sprintf("user:%s", username)
+	key := fmt.Sprintf("group:%d:%d", userID, friendID)
 	flag, err := global.RDB.Exists(ctx, key).Result()
 	if err != nil {
 		return false, err
@@ -19,20 +18,16 @@ func CheckUserIsExist(username string) (bool, error) {
 	return flag == 1, nil
 }
 
-func AddUser(uid int64, username, nickname, password, email string) error {
+func AddFriend(userID, friendID int64, t time.Time) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
-	key := fmt.Sprintf("user:%s", username)
+	key := fmt.Sprintf("group:%d:%d", userID, friendID)
 	field := map[string]interface{}{
-		"uid":      uid,
-		"nickname": nickname,
-		"password": password,
-		"email":    email,
-		"profile":  consts.DefultProfile,
+		"create_at": t,
 	}
-	if err := global.RDB.HMSet(ctx, key, field).Err(); err != nil {
+	_, err := global.RDB.HMSet(ctx, key, field).Result()
+	if err != nil {
 		return err
 	}
-	// 设置过期时间
 	return global.RDB.Expire(ctx, key, 24*time.Hour).Err()
 }
