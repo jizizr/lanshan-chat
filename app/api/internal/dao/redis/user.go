@@ -34,8 +34,5 @@ func AddUser(uid int64, username, nickname, password, email string) error {
 		return err
 	}
 	// 设置过期时间
-	if err := global.RDB.Expire(ctx, key, 2*time.Hour).Err(); err != nil {
-		return err
-	}
-	return nil
+	return global.RDB.Expire(ctx, key, 24*time.Hour).Err()
 }
