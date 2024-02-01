@@ -29,7 +29,8 @@ func Register(c *gin.Context) {
 		RespFailed(c, 400, consts.CodeUsernameWrongFormat)
 		return
 	}
-	if err := service.Register(u); err != nil {
+	uid, err := service.Register(u)
+	if err != nil {
 		if errors.Is(err, consts.UserExistError) {
 			RespFailed(c, 400, consts.CodeUserAlreadyExist)
 			return
@@ -38,7 +39,17 @@ func Register(c *gin.Context) {
 		global.Logger.Error("register failed", zap.Error(err))
 		return
 	}
-	RespSuccess(c, nil)
+
+	token, err := utils.GenToken(uid)
+	if err != nil {
+		RespFailed(c, 500, consts.CodeServerBusy)
+		global.Logger.Error("register failed", zap.Error(err))
+		return
+	}
+	RespSuccess(c, &model.ApiUser{
+		Uid:   uid,
+		Token: token,
+	})
 }
 
 func Login(c *gin.Context) {

@@ -10,32 +10,29 @@ import (
 	"lanshan_chat/utils"
 )
 
-func Register(user *model.ParamRegisterUser) error {
+func Register(user *model.ParamRegisterUser) (int64, error) {
 	flag, err := redis.CheckUserIsExist(user.Username)
 	if err != nil {
 		global.Logger.Error("register failed", zap.Error(err))
-		return err
+		return -1, err
 	}
 	if !flag {
 		flag, err = mysql.CheckUserIsExist(user.Username)
 		if err != nil {
 			global.Logger.Error("register failed", zap.Error(err))
-			return err
+			return -1, err
 		}
 	}
 	if flag {
-		return consts.UserExistError
+		return -1, consts.UserExistError
 	}
 	password := utils.CryptoPassword(user.Password)
-	err = mysql.AddUser(user.Username, user.Nickname, password, user.Email)
+	uid, err := mysql.AddUser(user.Username, user.Nickname, password, user.Email)
 	if err != nil {
-		return err
+		return -1, err
 	}
-	err = redis.AddUser(user.Username, user.Nickname, password, user.Email)
-	if err != nil {
-		return err
-	}
-	return nil
+	err = redis.AddUser(uid, user.Username, user.Nickname, password, user.Email)
+	return uid, err
 }
 
 func Login(user *model.ParamLoginUser) (int64, error) {

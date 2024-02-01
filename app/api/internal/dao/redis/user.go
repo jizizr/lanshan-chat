@@ -19,11 +19,12 @@ func CheckUserIsExist(username string) (bool, error) {
 	return flag == 1, nil
 }
 
-func AddUser(username, nickname, password, email string) error {
+func AddUser(uid int64, username, nickname, password, email string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
 	key := fmt.Sprintf("user:%s", username)
 	field := map[string]interface{}{
+		"uid":      uid,
 		"nickname": nickname,
 		"password": password,
 		"email":    email,

@@ -19,9 +19,12 @@ func CheckUserIsExist(username string) (flag bool, err error) {
 	return
 }
 
-func AddUser(username, nickname, password, email string) error {
-	_, err := global.MDB.Exec(AddUserStr, username, nickname, password, email, consts.DefultProfile)
-	return err
+func AddUser(username, nickname, password, email string) (int64, error) {
+	result, err := global.MDB.Exec(AddUserStr, username, nickname, password, email, consts.DefultProfile)
+	if err != nil {
+		return -1, err
+	}
+	return result.LastInsertId()
 }
 
 func QueryPasswordByUsername(username string) (uid int64, password string, err error) {
