@@ -87,3 +87,26 @@ func Login(c *gin.Context) {
 		Token: token,
 	})
 }
+
+func GetUserInfo(c *gin.Context) {
+	u := new(model.ParamGetUserInfo)
+	if err := c.ShouldBind(u); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if u.Uid == 0 {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	user, err := service.GetUserProfile(u.Uid)
+	if err != nil {
+		if errors.Is(err, consts.UserNotExistError) {
+			RespFailed(c, 400, consts.CodeUserNotExist)
+			return
+		}
+		RespFailed(c, 500, consts.CodeDBCheckUser)
+		global.Logger.Error("get user profile failed", zap.Error(err))
+		return
+	}
+	RespSuccess(c, user)
+}

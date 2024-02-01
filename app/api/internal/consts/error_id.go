@@ -16,11 +16,16 @@ const (
 	CodeInvalidToken
 	CodeWrongPassword
 	CodeServerBusy
+	CodeFriendAlreadyExist
+	CodeFriendNotExist
+	CodeGroupAlreadyExist
+	CodeGroupNotExist
 )
 
 // database error
 const (
 	CodeDBCheckUser RespCode = 2000 + iota
+	CodeDBAddUser
 )
 
 var codeMsgMap = map[RespCode]string{
@@ -36,6 +41,11 @@ var codeMsgMap = map[RespCode]string{
 	CodeInvalidToken:        "无效的token",
 	CodeWrongPassword:       "密码错误",
 	CodeServerBusy:          "服务器繁忙",
+	CodeDBAddUser:           "数据库添加用户失败",
+	CodeFriendAlreadyExist:  "好友已存在",
+	CodeFriendNotExist:      "好友不存在",
+	CodeGroupAlreadyExist:   "群组已存在",
+	CodeGroupNotExist:       "群组不存在",
 }
 
 func (code RespCode) Msg() string {

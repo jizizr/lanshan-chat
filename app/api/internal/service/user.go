@@ -11,7 +11,7 @@ import (
 )
 
 func Register(user *model.ParamRegisterUser) (int64, error) {
-	flag, err := mysql.CheckUserIsExist(user.Username)
+	flag, err := mysql.CheckUserIsExistByUsername(user.Username)
 	if err != nil {
 		return -1, err
 	}
@@ -19,17 +19,17 @@ func Register(user *model.ParamRegisterUser) (int64, error) {
 		return -1, consts.UserExistError
 	}
 	password := utils.CryptoPassword(user.Password)
-	uid, err := mysql.AddUser(user.Username, user.Nickname, password, user.Email)
+	uid, t, err := mysql.AddUser(user.Username, user.Nickname, password, user.Email)
 	if err != nil {
 		return -1, err
 	}
-	err = redis.AddUser(uid, user.Username, user.Nickname, password, user.Email)
+	err = redis.AddUser(uid, user.Username, user.Nickname, password, user.Email, t)
 	return uid, err
 }
 
 func Login(user *model.ParamLoginUser) (int64, error) {
 	// 判断用户是否存在
-	flag, err := mysql.CheckUserIsExist(user.Username)
+	flag, err := mysql.CheckUserIsExistByUsername(user.Username)
 	if err != nil {
 		global.Logger.Error("login failed", zap.Error(err))
 		return -1, err
@@ -57,4 +57,23 @@ func Login(user *model.ParamLoginUser) (int64, error) {
 		return -1, consts.PasswordWrongError
 	}
 	return uid, nil
+}
+
+func GetUserProfile(uid int64) (*model.User, error) {
+	// 判断用户是否存在
+	flag, err := redis.CheckUserIsExist(uid)
+	if err != nil {
+		return nil, err
+	}
+	if flag {
+		return redis.GetUserProfile(uid)
+	}
+	flag, err = mysql.CheckUserIsExistByUID(uid)
+	if err != nil {
+		return nil, err
+	}
+	if !flag {
+		return nil, consts.UserNotExistError
+	}
+	return mysql.QueryUserByUID(uid)
 }

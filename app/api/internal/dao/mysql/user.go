@@ -3,28 +3,39 @@ package mysql
 import (
 	"lanshan_chat/app/api/global"
 	"lanshan_chat/app/api/internal/consts"
+	"lanshan_chat/app/api/internal/model"
+	"time"
 )
 
 const (
 	CheckUserExistByUsernameStr = "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)"
-	AddUserStr                  = "INSERT INTO users(username,nickname,password,email,profile) VALUES (?, ?, ?, ?, ?)"
+	CheckUserExistByUIDStr      = "SELECT EXISTS(SELECT 1 FROM users WHERE user_id = ?)"
+	AddUserStr                  = "INSERT INTO users(username,nickname,password,email,profile,joined_at) VALUES (?, ?, ?, ?, ?, ?)"
 	QueryPasswordByUsernameStr  = "SELECT user_id,password FROM users WHERE username = ?"
 	QueryUserByEmailStr         = "SELECT user_id,password FROM users WHERE email = ?"
+	QueryUserByUIDStr           = "SELECT (user_id,username,nickname,email,profile,joined_at) FROM users WHERE user_id = ?"
 )
 
-// CheckUserIsExist 如果用户存在返回 true，否则返回 false
+// CheckUserIsExistByUsername 如果用户存在返回 true，否则返回 false
 // 如果数据库操作出错返回 error
-func CheckUserIsExist(username string) (flag bool, err error) {
+func CheckUserIsExistByUsername(username string) (flag bool, err error) {
 	err = global.MDB.Get(&flag, CheckUserExistByUsernameStr, username)
 	return
 }
 
-func AddUser(username, nickname, password, email string) (int64, error) {
-	result, err := global.MDB.Exec(AddUserStr, username, nickname, password, email, consts.DefultProfile)
+func CheckUserIsExistByUID(uid int64) (flag bool, err error) {
+	err = global.MDB.Get(&flag, CheckUserExistByUIDStr, uid)
+	return
+}
+
+func AddUser(username, nickname, password, email string) (int64, time.Time, error) {
+	t := time.Now()
+	result, err := global.MDB.Exec(AddUserStr, username, nickname, password, email, consts.DefultProfile, t)
 	if err != nil {
-		return -1, err
+		return -1, time.Time{}, err
 	}
-	return result.LastInsertId()
+	uid, err := result.LastInsertId()
+	return uid, t, err
 }
 
 func QueryPasswordByUsername(username string) (uid int64, password string, err error) {
@@ -40,5 +51,10 @@ func QueryUserByEmail(email string) (uid int64, password string, err error) {
 	if err := row.Scan(&uid, &password); err != nil {
 		return 0, "", err
 	}
+	return
+}
+
+func QueryUserByUID(uid int64) (user *model.User, err error) {
+	err = global.MDB.Get(user, QueryUserByUIDStr, uid)
 	return
 }
