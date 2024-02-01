@@ -2,11 +2,12 @@ package mysql
 
 import (
 	"lanshan_chat/app/api/global"
+	"lanshan_chat/app/api/internal/consts"
 )
 
 const (
 	CountUserByUsernameStr     = "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)"
-	AddUserStr                 = "INSERT INTO users(username,nickname,password,email) VALUES (?, ?, ?, ?)"
+	AddUserStr                 = "INSERT INTO users(username,nickname,password,email,profile) VALUES (?, ?, ?, ?, ?)"
 	QueryPasswordByUsernameStr = "SELECT uid,password FROM users WHERE username = ?"
 	QueryUserByEmailStr        = "SELECT uid,password FROM users WHERE email = ?"
 )
@@ -19,7 +20,7 @@ func CheckUserIsExist(username string) (flag bool, err error) {
 }
 
 func AddUser(username, nickname, password, email string) error {
-	_, err := global.MDB.Exec(AddUserStr, username, nickname, password, email)
+	_, err := global.MDB.Exec(AddUserStr, username, nickname, password, email, consts.DefultProfile)
 	return err
 }
 

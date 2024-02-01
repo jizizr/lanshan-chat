@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"lanshan_chat/app/api/global"
+	"lanshan_chat/app/api/internal/consts"
 	"time"
 )
 
@@ -25,7 +26,9 @@ func AddUser(username, nickname, password, email string) error {
 	field := map[string]interface{}{
 		"nickname": nickname,
 		"password": password,
-		"email":    email}
+		"email":    email,
+		"profile":  consts.DefultProfile,
+	}
 	if err := global.RDB.HMSet(ctx, key, field).Err(); err != nil {
 		return err
 	}
