@@ -37,3 +37,35 @@ func Register(user *model.ParamRegisterUser) error {
 	}
 	return nil
 }
+
+func Login(user *model.ParamLoginUser) (int64, error) {
+	// 判断用户是否存在
+	flag, err := mysql.CheckUserIsExist(user.Username)
+	if err != nil {
+		global.Logger.Error("login failed", zap.Error(err))
+		return -1, err
+	}
+	if !flag {
+		return -1, consts.UserNotExistError
+	}
+
+	var (
+		uid      int64
+		password string
+	)
+
+	// 判断用户输入的是用户名还是邮箱
+	if utils.Check_email(user.Username) {
+		uid, password, err = mysql.QueryUserByEmail(user.Username)
+	} else {
+		uid, password, err = mysql.QueryPasswordByUsername(user.Username)
+	}
+	if err != nil {
+		global.Logger.Error("login failed", zap.Error(err))
+		return -1, err
+	}
+	if password != utils.CryptoPassword(user.Password) {
+		return -1, consts.PasswordWrongError
+	}
+	return uid, nil
+}

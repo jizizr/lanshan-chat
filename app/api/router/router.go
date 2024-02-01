@@ -8,6 +8,7 @@ import (
 func InitRouter() error {
 	r := gin.Default()
 	r.POST("/register", controller.Register)
+	r.POST("/login", controller.Login)
 	err := r.Run(":8080")
 	if err != nil {
 		return err

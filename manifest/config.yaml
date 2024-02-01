@@ -28,3 +28,8 @@ database:
 server:
   host: localhost
   port: 8080
+
+auth:
+  jwt:
+    secret-key: "lanshan-chat"
+    expires-time: 3600
