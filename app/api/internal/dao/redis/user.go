@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-func CheckUserIsExist(username string) (bool, error) {
+func CheckUserIsExist(uid int64) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
-	key := fmt.Sprintf("user:%s", username)
+	key := fmt.Sprintf("user:%d", uid)
 	flag, err := global.RDB.Exists(ctx, key).Result()
 	if err != nil {
 		return false, err
@@ -22,9 +22,9 @@ func CheckUserIsExist(username string) (bool, error) {
 func AddUser(uid int64, username, nickname, password, email string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
-	key := fmt.Sprintf("user:%s", username)
+	key := fmt.Sprintf("user:%d", uid)
 	field := map[string]interface{}{
-		"uid":      uid,
+		"username": username,
 		"nickname": nickname,
 		"password": password,
 		"email":    email,

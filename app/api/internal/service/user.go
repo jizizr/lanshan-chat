@@ -11,15 +11,9 @@ import (
 )
 
 func Register(user *model.ParamRegisterUser) (int64, error) {
-	flag, err := redis.CheckUserIsExist(user.Username)
+	flag, err := mysql.CheckUserIsExist(user.Username)
 	if err != nil {
 		return -1, err
-	}
-	if !flag {
-		flag, err = mysql.CheckUserIsExist(user.Username)
-		if err != nil {
-			return -1, err
-		}
 	}
 	if flag {
 		return -1, consts.UserExistError
