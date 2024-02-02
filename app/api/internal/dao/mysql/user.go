@@ -13,7 +13,7 @@ const (
 	AddUserStr                  = "INSERT INTO users(username,nickname,password,email,profile,joined_at) VALUES (?, ?, ?, ?, ?, ?)"
 	QueryPasswordByUsernameStr  = "SELECT user_id,password FROM users WHERE username = ?"
 	QueryUserByEmailStr         = "SELECT user_id,password FROM users WHERE email = ?"
-	QueryUserByUIDStr           = "SELECT (user_id,username,nickname,email,profile,joined_at) FROM users WHERE user_id = ?"
+	QueryUserByUIDStr           = "SELECT user_id,username,nickname,email,profile,joined_at FROM users WHERE user_id = ?"
 )
 
 // CheckUserIsExistByUsername 如果用户存在返回 true，否则返回 false
@@ -54,7 +54,8 @@ func QueryUserByEmail(email string) (uid int64, password string, err error) {
 	return
 }
 
-func QueryUserByUID(uid int64) (user *model.User, err error) {
-	err = global.MDB.Get(user, QueryUserByUIDStr, uid)
-	return
+func QueryUserByUID(uid int64) (*model.User, error) {
+	user := new(model.User)
+	err := global.MDB.Get(user, QueryUserByUIDStr, uid)
+	return user, err
 }

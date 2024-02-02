@@ -110,3 +110,23 @@ func GetUserInfo(c *gin.Context) {
 	}
 	RespSuccess(c, user)
 }
+
+func CheckUsername(c *gin.Context) {
+	u := new(model.ParamCheckUsername)
+	if err := c.ShouldBind(u); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if u.Username == "" {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	flag, err := service.CheckUsername(u.Username)
+	if err != nil {
+		RespFailed(c, 500, consts.CodeDBCheckUser)
+		global.Logger.Error("check user is exist failed", zap.Error(err))
+		return
+	}
+	RespSuccess(c, flag)
+
+}

@@ -16,6 +16,7 @@ func InitRouter() error {
 		public.POST("/register", controller.Register)
 		public.POST("/login", controller.Login)
 		public.GET("/user", controller.GetUserInfo)
+		public.GET("/username", controller.CheckUsername)
 	}
 
 	// 需要登录的接口

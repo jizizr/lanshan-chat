@@ -11,13 +11,15 @@ import (
 )
 
 func Register(user *model.ParamRegisterUser) (int64, error) {
-	flag, err := mysql.CheckUserIsExistByUsername(user.Username)
+	// 检查username是否被占用
+	flag, err := CheckUsername(user.Username)
 	if err != nil {
 		return -1, err
 	}
 	if flag {
 		return -1, consts.UserExistError
 	}
+	// 添加用户
 	password := utils.CryptoPassword(user.Password)
 	uid, t, err := mysql.AddUser(user.Username, user.Nickname, password, user.Email)
 	if err != nil {
@@ -76,4 +78,19 @@ func GetUserProfile(uid int64) (*model.User, error) {
 		return nil, consts.UserNotExistError
 	}
 	return mysql.QueryUserByUID(uid)
+}
+
+func CheckUsername(username string) (flag bool, err error) {
+	if flag, err = redis.CheckUsername(username); err != nil {
+		return
+	}
+	if !flag {
+		flag, err = mysql.CheckUserIsExistByUsername(username)
+	}
+
+	// 如果数据库中存在该用户，将其添加到redis缓存中
+	if flag {
+		redis.AddToSet(username)
+	}
+	return
 }

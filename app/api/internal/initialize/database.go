@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 	"lanshan_chat/app/api/global"
 	"time"
 )
@@ -39,15 +40,16 @@ func setupMysql() {
 func setupRedis() {
 	config := global.Config.DatabaseConfig.RedisConfig
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     config.Host + config.Port,
+		Addr:     config.Host + ":" + config.Port,
 		Username: config.Username,
 		Password: config.Password,
 		DB:       config.DB,
 	})
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	_, err := rdb.Ping(ctx).Result()
 	if err != nil {
-		global.Logger.Fatal("connect redis failed")
+		global.Logger.Fatal("connect redis failed", zap.Error(err))
 	}
 	global.RDB = rdb
 

@@ -21,9 +21,21 @@ func CheckUserIsExist(uid int64) (bool, error) {
 	return flag == 1, nil
 }
 
-func AddUser(uid int64, username, nickname, password, email string, t time.Time) error {
+func CheckUsername(username string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
+	return global.RDB.SIsMember(ctx, "users", username).Result()
+}
+
+func AddToSet(username string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
+	global.RDB.SAdd(ctx, "users", username)
+}
+func AddUser(uid int64, username, nickname, password, email string, t time.Time) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
+	defer cancel()
+	AddToSet(username)
 	key := fmt.Sprintf("user:%d", uid)
 	field := map[string]interface{}{
 		"username":  username,
@@ -48,13 +60,13 @@ func GetUserProfile(uid int64) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	t, _ := strconv.Atoi(field["joined_at"])
+	t, _ := strconv.ParseInt(field["joined_at"], 10, 64)
 	return &model.User{
 		Uid:      uid,
 		Username: field["username"],
 		Nickname: field["nickname"],
 		Email:    field["email"],
 		Profile:  field["profile"],
-		JoinedAt: t,
+		JoinedAt: time.Unix(t, 0),
 	}, nil
 }
