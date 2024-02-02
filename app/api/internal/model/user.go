@@ -29,6 +29,11 @@ type ParamModifyUserInfo struct {
 	Profile  string `json:"profile" form:"profile"`
 }
 
+type ParamModifyPassword struct {
+	OldPassword string `json:"old_password" form:"old_password"`
+	NewPassword string `json:"new_password" form:"new_password"`
+}
+
 type ApiUser struct {
 	Uid   int64  `json:"uid"`
 	Token string `json:"token"`

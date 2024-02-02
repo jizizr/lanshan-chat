@@ -157,3 +157,30 @@ func ModifyUserInfo(c *gin.Context) {
 	}
 	RespSuccess(c, nil)
 }
+
+func ModifyPassword(c *gin.Context) {
+	u := new(model.ParamModifyPassword)
+	if err := c.ShouldBind(u); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if u.OldPassword == "" || u.NewPassword == "" {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	uid, ok := GetUID(c)
+	if !ok {
+		RespFailed(c, 400, consts.CodeServerBusy)
+		return
+	}
+	if err := service.ModifyPassword(uid, u); err != nil {
+		if errors.Is(err, consts.PasswordWrongError) {
+			RespFailed(c, 400, consts.CodeWrongPassword)
+			return
+		}
+		RespFailed(c, 500, consts.CodeDBCheckUser)
+		global.Logger.Error("modify password failed", zap.Error(err))
+		return
+	}
+	RespSuccess(c, nil)
+}

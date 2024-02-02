@@ -129,6 +129,12 @@ func ModifyUserInfo(uid int64, u *model.ParamModifyUserInfo) error {
 		if flag {
 			return consts.UserExistError
 		}
+
+		defer func(oldUsername, newUsername string) {
+			redis.DelFromSet(oldUsername)
+			redis.AddToSet(newUsername)
+		}(user.Username, u.Username)
+
 		user.Username = u.Username
 	}
 	if u.Nickname != "" {
@@ -141,6 +147,22 @@ func ModifyUserInfo(uid int64, u *model.ParamModifyUserInfo) error {
 		user.Profile = u.Profile
 	}
 
+	if err := mysql.ModifyUserInfo(user); err != nil {
+		return err
+	}
+	return redis.ModifyUserInfo(user)
+}
+
+func ModifyPassword(uid int64, u *model.ParamModifyPassword) error {
+	user, err := getUser(uid)
+	if err != nil {
+		return err
+	}
+	if user.Password != utils.CryptoPassword(u.OldPassword) {
+		return consts.PasswordWrongError
+	}
+	user.Password = utils.CryptoPassword(u.NewPassword)
+	user.Uid = uid
 	if err := mysql.ModifyUserInfo(user); err != nil {
 		return err
 	}

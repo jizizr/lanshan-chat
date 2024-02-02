@@ -18,6 +18,7 @@ const (
 						           SET username = :username,
 						               nickname = :nickname,
 						               email = :email,
+						               password = :password,
 						               profile = :profile
 						           WHERE user_id = :user_id`
 	QueryUserStr = "SELECT * FROM users WHERE user_id = ?"

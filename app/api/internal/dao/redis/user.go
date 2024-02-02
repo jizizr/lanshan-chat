@@ -32,6 +32,13 @@ func AddToSet(username string) {
 	defer cancel()
 	global.RDB.SAdd(ctx, "users", username)
 }
+
+func DelFromSet(username string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
+	global.RDB.SRem(ctx, "users", username)
+}
+
 func AddUser(uid int64, username, nickname, password, email string, t time.Time) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
 	defer cancel()
