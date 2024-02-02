@@ -61,14 +61,14 @@ func Login(user *model.ParamLoginUser) (int64, error) {
 	return uid, nil
 }
 
-func GetUserProfile(uid int64) (*model.User, error) {
+func GetUserInfo(uid int64) (*model.UserInfo, error) {
 	// 判断用户是否存在
 	flag, err := redis.CheckUserIsExist(uid)
 	if err != nil {
 		return nil, err
 	}
 	if flag {
-		return redis.GetUserProfile(uid)
+		return redis.GetUserInfo(uid)
 	}
 	flag, err = mysql.CheckUserIsExistByUID(uid)
 	if err != nil {
@@ -93,4 +93,56 @@ func CheckUsername(username string) (flag bool, err error) {
 		redis.AddToSet(username)
 	}
 	return
+}
+
+func getUser(uid int64) (*model.User, error) {
+	// 判断用户是否存在
+	flag, err := redis.CheckUserIsExist(uid)
+	if err != nil {
+		return nil, err
+	}
+	if flag {
+		return redis.GetUser(uid)
+	}
+
+	flag, err = mysql.CheckUserIsExistByUID(uid)
+	if err != nil {
+		return nil, err
+	}
+	if !flag {
+		return nil, consts.UserNotExistError
+	}
+	return mysql.QueryUser(uid)
+}
+
+func ModifyUserInfo(uid int64, u *model.ParamModifyUserInfo) error {
+	user, err := getUser(uid)
+	if err != nil {
+		return err
+	}
+
+	if u.Username != "" {
+		flag, err := CheckUsername(u.Username)
+		if err != nil {
+			return err
+		}
+		if flag {
+			return consts.UserExistError
+		}
+		user.Username = u.Username
+	}
+	if u.Nickname != "" {
+		user.Nickname = u.Nickname
+	}
+	if u.Email != "" {
+		user.Email = u.Email
+	}
+	if u.Profile != "" {
+		user.Profile = u.Profile
+	}
+
+	if err := mysql.ModifyUserInfo(user); err != nil {
+		return err
+	}
+	return redis.ModifyUserInfo(user)
 }

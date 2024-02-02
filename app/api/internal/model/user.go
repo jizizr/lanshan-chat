@@ -22,9 +22,25 @@ type ParamCheckUsername struct {
 	Username string `json:"username" form:"username"`
 }
 
+type ParamModifyUserInfo struct {
+	Username string `json:"username" form:"username"`
+	Nickname string `json:"nickname" form:"nickname"`
+	Email    string `json:"email" form:"email"`
+	Profile  string `json:"profile" form:"profile"`
+}
+
 type ApiUser struct {
 	Uid   int64  `json:"uid"`
 	Token string `json:"token"`
+}
+
+type UserInfo struct {
+	Uid      int64     `json:"user_id" db:"user_id"`
+	Username string    `json:"username" db:"username"`
+	Nickname string    `json:"nickname" db:"nickname"`
+	Email    string    `json:"email" db:"email"`
+	Profile  string    `json:"profile" db:"profile"`
+	JoinedAt time.Time `json:"joined_at" db:"joined_at"`
 }
 
 type User struct {
@@ -33,5 +49,6 @@ type User struct {
 	Nickname string    `json:"nickname" db:"nickname"`
 	Email    string    `json:"email" db:"email"`
 	Profile  string    `json:"profile" db:"profile"`
+	Password string    `json:"password" db:"password"`
 	JoinedAt time.Time `json:"joined_at" db:"joined_at"`
 }

@@ -52,7 +52,26 @@ func AddUser(uid int64, username, nickname, password, email string, t time.Time)
 	return global.RDB.Expire(ctx, key, 24*time.Hour).Err()
 }
 
-func GetUserProfile(uid int64) (*model.User, error) {
+func GetUserInfo(uid int64) (*model.UserInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
+	key := fmt.Sprintf("user:%d", uid)
+	field, err := global.RDB.HGetAll(ctx, key).Result()
+	if err != nil {
+		return nil, err
+	}
+	t, _ := strconv.ParseInt(field["joined_at"], 10, 64)
+	return &model.UserInfo{
+		Uid:      uid,
+		Username: field["username"],
+		Nickname: field["nickname"],
+		Email:    field["email"],
+		Profile:  field["profile"],
+		JoinedAt: time.Unix(t, 0),
+	}, nil
+}
+
+func GetUser(uid int64) (*model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
 	key := fmt.Sprintf("user:%d", uid)
@@ -67,6 +86,23 @@ func GetUserProfile(uid int64) (*model.User, error) {
 		Nickname: field["nickname"],
 		Email:    field["email"],
 		Profile:  field["profile"],
+		Password: field["password"],
 		JoinedAt: time.Unix(t, 0),
 	}, nil
+
+}
+
+func ModifyUserInfo(u *model.User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
+	key := fmt.Sprintf("user:%d", u.Uid)
+	field := map[string]interface{}{
+		"username":  u.Username,
+		"nickname":  u.Nickname,
+		"email":     u.Email,
+		"password":  u.Password,
+		"profile":   u.Profile,
+		"joined_at": u.JoinedAt.Unix(),
+	}
+	return global.RDB.HMSet(ctx, key, field).Err()
 }

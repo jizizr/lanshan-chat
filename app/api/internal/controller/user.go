@@ -98,7 +98,7 @@ func GetUserInfo(c *gin.Context) {
 		RespFailed(c, 400, consts.CodeParamEmpty)
 		return
 	}
-	user, err := service.GetUserProfile(u.Uid)
+	user, err := service.GetUserInfo(u.Uid)
 	if err != nil {
 		if errors.Is(err, consts.UserNotExistError) {
 			RespFailed(c, 400, consts.CodeUserNotExist)
@@ -129,4 +129,31 @@ func CheckUsername(c *gin.Context) {
 	}
 	RespSuccess(c, flag)
 
+}
+
+func ModifyUserInfo(c *gin.Context) {
+	u := new(model.ParamModifyUserInfo)
+	if err := c.ShouldBind(u); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if u.Username == "" && u.Nickname == "" && u.Email == "" && u.Profile == "" {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	uid, ok := GetUID(c)
+	if !ok {
+		RespFailed(c, 400, consts.CodeServerBusy)
+		return
+	}
+	if err := service.ModifyUserInfo(uid, u); err != nil {
+		if errors.Is(err, consts.UserExistError) {
+			RespFailed(c, 400, consts.CodeUserAlreadyExist)
+			return
+		}
+		RespFailed(c, 500, consts.CodeDBCheckUser)
+		global.Logger.Error("modify user info failed", zap.Error(err))
+		return
+	}
+	RespSuccess(c, nil)
 }

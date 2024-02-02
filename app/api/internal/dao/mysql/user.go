@@ -14,6 +14,13 @@ const (
 	QueryPasswordByUsernameStr  = "SELECT user_id,password FROM users WHERE username = ?"
 	QueryUserByEmailStr         = "SELECT user_id,password FROM users WHERE email = ?"
 	QueryUserByUIDStr           = "SELECT user_id,username,nickname,email,profile,joined_at FROM users WHERE user_id = ?"
+	ModifyUserInfoStr           = `UPDATE users 
+						           SET username = :username,
+						               nickname = :nickname,
+						               email = :email,
+						               profile = :profile
+						           WHERE user_id = :user_id`
+	QueryUserStr = "SELECT * FROM users WHERE user_id = ?"
 )
 
 // CheckUserIsExistByUsername 如果用户存在返回 true，否则返回 false
@@ -54,8 +61,19 @@ func QueryUserByEmail(email string) (uid int64, password string, err error) {
 	return
 }
 
-func QueryUserByUID(uid int64) (*model.User, error) {
-	user := new(model.User)
+func QueryUserByUID(uid int64) (*model.UserInfo, error) {
+	user := new(model.UserInfo)
 	err := global.MDB.Get(user, QueryUserByUIDStr, uid)
+	return user, err
+}
+
+func ModifyUserInfo(u *model.User) error {
+	_, err := global.MDB.NamedExec(ModifyUserInfoStr, u)
+	return err
+}
+
+func QueryUser(uid int64) (*model.User, error) {
+	user := new(model.User)
+	err := global.MDB.Get(user, QueryUserStr, uid)
 	return user, err
 }

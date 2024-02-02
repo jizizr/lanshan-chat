@@ -15,8 +15,8 @@ func InitRouter() error {
 	{
 		public.POST("/register", controller.Register)
 		public.POST("/login", controller.Login)
-		public.GET("/user", controller.GetUserInfo)
-		public.GET("/username", controller.CheckUsername)
+		public.GET("/user/info", controller.GetUserInfo)
+		public.GET("/user/check", controller.CheckUsername)
 	}
 
 	// 需要登录的接口
@@ -24,6 +24,7 @@ func InitRouter() error {
 	private.Use(middleware.JwtAuth)
 	{
 		private.POST("/friend", controller.AddFriend)
+		private.PUT("/user/info", controller.ModifyUserInfo)
 	}
 	err := r.Run(":8080")
 	if err != nil {
