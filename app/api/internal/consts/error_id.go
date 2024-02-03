@@ -23,6 +23,11 @@ const (
 	CodeFileTooLarge
 	CodeFileEmpty
 	CodeCompressFailed
+	CodeGroupAlreadyJoin
+	CodeUserInGroupBanned
+	CodeGroupIsPublic
+	CodeGroupIsPrivate
+	CodePermissionDenied
 )
 
 // database error
@@ -30,6 +35,7 @@ const (
 	CodeDBCheckUser RespCode = 2000 + iota
 	CodeDBAddUser
 	CodeDBCreateGroup
+	CodeDBJoinGroup
 )
 
 var codeMsgMap = map[RespCode]string{
@@ -54,6 +60,12 @@ var codeMsgMap = map[RespCode]string{
 	CodeFileEmpty:           "文件为空",
 	CodeCompressFailed:      "压缩失败",
 	CodeDBCreateGroup:       "数据库创建群组失败",
+	CodeDBJoinGroup:         "数据库加入群组失败",
+	CodeGroupAlreadyJoin:    "已经加入群组",
+	CodeUserInGroupBanned:   "用户在群组中被封禁",
+	CodeGroupIsPublic:       "群组是公开的",
+	CodeGroupIsPrivate:      "群组是私有的",
+	CodePermissionDenied:    "权限不足",
 }
 
 func (code RespCode) Msg() string {

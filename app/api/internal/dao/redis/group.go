@@ -22,7 +22,14 @@ func CreateGroup(g *model.Group) {
 	global.RDB.HMSet(ctx, key, field)
 }
 
-func JoinGroup(uid, groupID int64, role string, t time.Time, lastRead int64) {
+func GetGroupType(groupID int64) string {
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
+	key := fmt.Sprintf("group:%d", groupID)
+	return global.RDB.HGet(ctx, key, "type").Val()
+}
+
+func JoinGroup(uid, groupID, lastRead int64, role string, t time.Time) {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
 	key := fmt.Sprintf("group:%d:%d", groupID, uid)
@@ -31,7 +38,17 @@ func JoinGroup(uid, groupID int64, role string, t time.Time, lastRead int64) {
 		"role":        role,
 		"joined_at":   t.Unix(),
 		"status":      "ok",
-		"baned_until": nil,
+		"muted_until": nil,
 	}
 	global.RDB.HMSet(ctx, key, field)
+}
+
+func GetUserSRInGroup(uid, groupID int64) (status string, role string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
+	key := fmt.Sprintf("group:%d:%d", groupID, uid)
+	result := global.RDB.HMGet(ctx, key, "status", "role").Val()
+	status, _ = result[0].(string)
+	role, _ = result[1].(string)
+	return
 }
