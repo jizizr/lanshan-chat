@@ -15,18 +15,19 @@ func InitRouter() error {
 	{
 		public.POST("/register", controller.Register)
 		public.POST("/login", controller.Login)
-		public.GET("/user/info", controller.GetUserInfo)
-		public.GET("/user/check", controller.CheckUsername)
+		public.GET("/users/info", controller.GetUserInfo)
+		public.GET("/users/availability", controller.CheckUsername)
 	}
 
 	// 需要登录的接口
 	private := r.Group("")
 	private.Use(middleware.JwtAuth)
 	{
-		private.POST("/friend", controller.AddFriend)
-		private.PUT("/user/info", controller.ModifyUserInfo)
-		private.PUT("/user/password", controller.ModifyPassword)
-		private.POST("/group", controller.CreateGroup)
+		private.POST("/friends", controller.AddFriend)
+		private.PUT("/users/info", controller.ModifyUserInfo)
+		private.PUT("/users/password", controller.ModifyPassword)
+		private.POST("/groups", controller.CreateGroup)
+		private.POST("/groups/:group_id/member", controller.JoinGroup)
 	}
 	err := r.Run(":8080")
 	if err != nil {
