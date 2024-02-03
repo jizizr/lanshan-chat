@@ -26,6 +26,7 @@ func InitRouter() error {
 		private.POST("/friend", controller.AddFriend)
 		private.PUT("/user/info", controller.ModifyUserInfo)
 		private.PUT("/user/password", controller.ModifyPassword)
+		private.POST("/group", controller.CreateGroup)
 	}
 	err := r.Run(":8080")
 	if err != nil {

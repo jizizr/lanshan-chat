@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"lanshan_chat/app/api/internal/consts"
 	"net/http"
@@ -37,4 +38,9 @@ func GetUID(c *gin.Context) (UserID int64, ok bool) {
 		return
 	}
 	return
+}
+
+// UploadBin 模拟上传二进制文件
+func UploadBin(_bin []byte, filename string) (url string, err error) {
+	return fmt.Sprintf("https://some.cos-server.com/%s", filename), nil
 }

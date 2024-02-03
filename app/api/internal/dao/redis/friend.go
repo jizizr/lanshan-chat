@@ -25,9 +25,5 @@ func AddFriend(userID, friendID int64, t time.Time) error {
 	field := map[string]interface{}{
 		"create_at": t,
 	}
-	_, err := global.RDB.HMSet(ctx, key, field).Result()
-	if err != nil {
-		return err
-	}
-	return global.RDB.Expire(ctx, key, 24*time.Hour).Err()
+	return global.RDB.HMSet(ctx, key, field).Err()
 }

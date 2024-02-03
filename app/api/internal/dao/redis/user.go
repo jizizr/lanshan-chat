@@ -52,11 +52,7 @@ func AddUser(uid int64, username, nickname, password, email string, t time.Time)
 		"profile":   consts.DefultProfile,
 		"joined_at": t.Unix(),
 	}
-	if err := global.RDB.HMSet(ctx, key, field).Err(); err != nil {
-		return err
-	}
-	// 设置过期时间
-	return global.RDB.Expire(ctx, key, 24*time.Hour).Err()
+	return global.RDB.HMSet(ctx, key, field).Err()
 }
 
 func GetUserInfo(uid int64) (*model.UserInfo, error) {

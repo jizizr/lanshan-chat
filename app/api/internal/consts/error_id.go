@@ -20,12 +20,16 @@ const (
 	CodeFriendNotExist
 	CodeGroupAlreadyExist
 	CodeGroupNotExist
+	CodeFileTooLarge
+	CodeFileEmpty
+	CodeCompressFailed
 )
 
 // database error
 const (
 	CodeDBCheckUser RespCode = 2000 + iota
 	CodeDBAddUser
+	CodeDBCreateGroup
 )
 
 var codeMsgMap = map[RespCode]string{
@@ -46,6 +50,10 @@ var codeMsgMap = map[RespCode]string{
 	CodeFriendNotExist:      "好友不存在",
 	CodeGroupAlreadyExist:   "群组已存在",
 	CodeGroupNotExist:       "群组不存在",
+	CodeFileTooLarge:        "文件过大",
+	CodeFileEmpty:           "文件为空",
+	CodeCompressFailed:      "压缩失败",
+	CodeDBCreateGroup:       "数据库创建群组失败",
 }
 
 func (code RespCode) Msg() string {
