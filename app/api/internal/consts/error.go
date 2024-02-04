@@ -15,4 +15,5 @@ var (
 	GroupIsPublicError    = errors.New("群组是公开群")
 	GroupIsPrivateError   = errors.New("群组是私有群")
 	PermissionDeniedError = errors.New("权限不足")
+	EnumError             = errors.New("枚举错误")
 )

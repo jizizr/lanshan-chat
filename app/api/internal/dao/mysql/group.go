@@ -13,6 +13,8 @@ const (
 	CheckGroupIsExistStr  = "SELECT type FROM `groups` WHERE group_id = ?"
 	JoinGroupStr          = "INSERT INTO `user_groups`(user_id, group_id, role, joined_at,last_read) VALUES (?, ?, ?, ?, ?)"
 	QueryUserSRInGroupStr = "SELECT status,role FROM `user_groups` WHERE group_id = ? AND user_id = ?"
+	ChangeMemberStatusStr = "UPDATE `user_groups` SET status = ? WHERE group_id = ? AND user_id = ?"
+	DeleteGroupUserStr    = "DELETE FROM `user_groups` WHERE group_id = ? AND user_id = ?"
 )
 
 func CreateGroup(g *model.ParamCreateGroup, url string, uid int64) (group *model.Group, err error) {
@@ -66,5 +68,15 @@ func QueryUserSRInGroup(uid, groupID int64) (status, role string, err error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		err = nil
 	}
+	return
+}
+
+func ChangeMemberStatus(groupID, changeUserID int64, status string) (err error) {
+	_, err = global.MDB.Exec(ChangeMemberStatusStr, status, groupID, changeUserID)
+	return
+}
+
+func DeleteGroupUser(groupID, uid int64) (err error) {
+	_, err = global.MDB.Exec(DeleteGroupUserStr, groupID, uid)
 	return
 }

@@ -30,7 +30,10 @@ func InitRouter() error {
 		private.POST("/groups/public/member", controller.JoinPublicGroup)
 		private.POST("/groups/private/member", controller.JoinPrivateGroup)
 		private.GET("/groups/private/token", controller.GetPrivateGroupToken)
-		//private.POST("/groups/invitations", controller.InviteToGroup)
+		private.POST("/groups/member", controller.InviteToGroup)
+		private.DELETE("/groups/member", controller.KickFromGroup)
+		private.PUT("/groups/member", controller.ChangeMemberStatus)
+		private.DELETE("/groups/me", controller.LeaveGroup)
 	}
 	err := r.Run(":8080")
 	if err != nil {

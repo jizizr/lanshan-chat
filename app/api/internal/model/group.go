@@ -22,6 +22,26 @@ type ParamGetPrivateGroupToken struct {
 	ExpiresTime int64 `json:"expires_time" form:"expires_time"`
 }
 
+type ParamInviteUser struct {
+	GroupID  int64 `json:"group_id" form:"group_id"`
+	InviteID int64 `json:"invite_id" form:"invite_id"`
+}
+
+type ParamChangeMemberStatus struct {
+	GroupID  int64  `json:"group_id" form:"group_id"`
+	ChangeID int64  `json:"change_id" form:"change_id"`
+	Status   string `json:"status" form:"status"`
+}
+
+type ParamKickFromGroup struct {
+	GroupID int64 `json:"group_id" form:"group_id"`
+	KickID  int64 `json:"kick_id" form:"kick_id"`
+}
+
+type ParamLeaveGroup struct {
+	GroupID int64 `json:"group_id" form:"group_id"`
+}
+
 type PrivateGroupID struct {
 	GroupID int64 `json:"group_id" form:"group_id"`
 }

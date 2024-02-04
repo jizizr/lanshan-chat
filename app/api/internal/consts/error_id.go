@@ -28,6 +28,8 @@ const (
 	CodeGroupIsPublic
 	CodeGroupIsPrivate
 	CodePermissionDenied
+	CodeNotInEnum
+	CodeUserNotInGroup
 )
 
 // database error
@@ -36,6 +38,9 @@ const (
 	CodeDBAddUser
 	CodeDBCreateGroup
 	CodeDBJoinGroup
+	CodeDBInviteUser
+	CodeDBChangeUser
+	CodeDBKickUser
 )
 
 var codeMsgMap = map[RespCode]string{
@@ -63,9 +68,14 @@ var codeMsgMap = map[RespCode]string{
 	CodeDBJoinGroup:         "数据库加入群组失败",
 	CodeGroupAlreadyJoin:    "已经加入群组",
 	CodeUserInGroupBanned:   "用户在群组中被封禁",
+	CodeUserNotInGroup:      "用户不在群组中",
 	CodeGroupIsPublic:       "群组是公开的",
 	CodeGroupIsPrivate:      "群组是私有的",
 	CodePermissionDenied:    "权限不足",
+	CodeDBInviteUser:        "数据库邀请用户失败",
+	CodeNotInEnum:           "不在枚举中",
+	CodeDBChangeUser:        "数据库修改用户失败",
+	CodeDBKickUser:          "数据库踢出用户失败",
 }
 
 func (code RespCode) Msg() string {

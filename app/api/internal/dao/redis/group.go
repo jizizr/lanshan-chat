@@ -52,3 +52,17 @@ func GetUserSRInGroup(uid, groupID int64) (status string, role string) {
 	role, _ = result[1].(string)
 	return
 }
+
+func ChangeMemberStatus(groupID, changeUserID int64, status string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
+	key := fmt.Sprintf("group:%d:%d", groupID, changeUserID)
+	return global.RDB.HSet(ctx, key, "status", status).Err()
+}
+
+func DelGroupUser(groupID, kickID int64) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
+	key := fmt.Sprintf("group:%d:%d", groupID, kickID)
+	return global.RDB.Del(ctx, key).Err()
+}

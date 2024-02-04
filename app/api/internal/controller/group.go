@@ -157,3 +157,117 @@ func GetPrivateGroupToken(c *gin.Context) {
 	}
 	RespSuccess(c, gin.H{"token": token})
 }
+
+func InviteToGroup(c *gin.Context) {
+	g := new(model.ParamInviteUser)
+	if err := c.ShouldBind(g); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if g.GroupID == 0 || g.InviteID == 0 {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	userID, ok := GetUID(c)
+	if !ok {
+		RespFailed(c, 400, consts.CodeServerBusy)
+		return
+	}
+	if err := service.InviteToGroup(userID, g.GroupID, g.InviteID); err != nil {
+		if errors.Is(err, consts.PermissionDeniedError) {
+			RespFailed(c, 400, consts.CodePermissionDenied)
+		} else if errors.Is(err, consts.GroupAlreadyJoinError) {
+			RespFailed(c, 400, consts.CodeGroupAlreadyJoin)
+		} else if errors.Is(err, consts.EnumError) {
+			RespFailed(c, 500, consts.CodeNotInEnum)
+		} else {
+			RespFailed(c, 500, consts.CodeDBJoinGroup)
+			global.Logger.Error("JoinGroup failed", zap.Error(err))
+		}
+		return
+	}
+	RespSuccess(c, nil)
+}
+
+func ChangeMemberStatus(c *gin.Context) {
+	g := new(model.ParamChangeMemberStatus)
+	if err := c.ShouldBind(g); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if g.GroupID == 0 || g.ChangeID == 0 || g.Status == "" {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	userID, ok := GetUID(c)
+	if !ok {
+		RespFailed(c, 400, consts.CodeServerBusy)
+		return
+	}
+	if err := service.ChangeMemberStatus(userID, g.GroupID, g.ChangeID, g.Status); err != nil {
+		if errors.Is(err, consts.PermissionDeniedError) {
+			RespFailed(c, 400, consts.CodePermissionDenied)
+		} else {
+			RespFailed(c, 500, consts.CodeDBChangeUser)
+			global.Logger.Error("ChangeMemberStatus failed", zap.Error(err))
+		}
+		return
+	}
+	RespSuccess(c, nil)
+}
+
+func KickFromGroup(c *gin.Context) {
+	g := new(model.ParamKickFromGroup)
+	if err := c.ShouldBind(g); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if g.GroupID == 0 || g.KickID == 0 {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	userID, ok := GetUID(c)
+	if !ok {
+		RespFailed(c, 400, consts.CodeServerBusy)
+		return
+	}
+	if err := service.KickFromGroup(userID, g.GroupID, g.KickID); err != nil {
+		if errors.Is(err, consts.PermissionDeniedError) {
+			RespFailed(c, 400, consts.CodePermissionDenied)
+		} else {
+			RespFailed(c, 500, consts.CodeDBKickUser)
+			global.Logger.Error("KickUser failed", zap.Error(err))
+		}
+		return
+	}
+	RespSuccess(c, nil)
+}
+
+func LeaveGroup(c *gin.Context) {
+	g := new(model.ParamLeaveGroup)
+	if err := c.ShouldBind(g); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if g.GroupID == 0 {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	userID, ok := GetUID(c)
+	if !ok {
+		RespFailed(c, 400, consts.CodeServerBusy)
+		return
+	}
+	if err := service.LeaveGroup(userID, g.GroupID); err != nil {
+		if errors.Is(err, consts.GroupNotExistError) {
+			RespFailed(c, 400, consts.CodeUserNotInGroup)
+		} else if errors.Is(err, consts.BanedError) {
+			RespFailed(c, 400, consts.CodeUserInGroupBanned)
+		} else {
+			RespFailed(c, 500, consts.CodeDBKickUser)
+			global.Logger.Error("LeaveGroup failed", zap.Error(err))
+		}
+		return
+	}
+	RespSuccess(c, nil)
+}
