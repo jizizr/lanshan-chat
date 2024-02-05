@@ -184,3 +184,39 @@ func ModifyPassword(c *gin.Context) {
 	}
 	RespSuccess(c, nil)
 }
+
+func Search(c *gin.Context) {
+	q := c.Query("q")
+	t := c.Query("type")
+
+	if q == "" || t == "" {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	var (
+		users  []model.UserInfo
+		groups []model.Group
+		err    error
+	)
+	switch t {
+	case "user":
+		users, err = service.SearchUser(q)
+	case "group":
+		groups, err = service.SearchGroup(q)
+	default:
+		RespFailed(c, 400, consts.CodeNotInEnum)
+		return
+	}
+	if err != nil {
+		RespFailed(c, 500, consts.CodeDBCheckUser)
+		global.Logger.Error("search user failed", zap.Error(err))
+		return
+	}
+	if len(users) != 0 {
+		RespSuccess(c, users)
+	} else if len(groups) != 0 {
+		RespSuccess(c, groups)
+	} else {
+		RespFailed(c, 400, consts.CodeSearchEmpty)
+	}
+}

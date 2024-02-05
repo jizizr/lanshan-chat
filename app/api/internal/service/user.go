@@ -168,3 +168,7 @@ func ModifyPassword(uid int64, u *model.ParamModifyPassword) error {
 	}
 	return redis.ModifyUserInfo(user)
 }
+
+func SearchUser(keyword string) ([]model.UserInfo, error) {
+	return mysql.SearchUser(keyword)
+}

@@ -31,6 +31,7 @@ const (
 	CodeNotInEnum
 	CodeUserNotInGroup
 	CodeMessageNotExist
+	CodeSearchEmpty
 )
 
 // database error
@@ -84,6 +85,7 @@ var codeMsgMap = map[RespCode]string{
 	CodeDBDeleteMessage:     "数据库删除消息失败",
 	CodeMessageNotExist:     "消息不存在",
 	CodeDBGetMessage:        "数据库获取消息失败",
+	CodeSearchEmpty:         "搜索结果为空",
 }
 
 func (code RespCode) Msg() string {

@@ -21,7 +21,10 @@ const (
 						               password = :password,
 						               profile = :profile
 						           WHERE user_id = :user_id`
-	QueryUserStr = "SELECT * FROM users WHERE user_id = ?"
+	QueryUserStr  = "SELECT * FROM users WHERE user_id = ?"
+	SearchUserStr = `SELECT user_id,username,nickname,email,profile,joined_at 
+					 FROM users 
+					 WHERE username LIKE ? OR nickname LIKE ? LIMIT 10`
 )
 
 // CheckUserIsExistByUsername 如果用户存在返回 true，否则返回 false
@@ -77,4 +80,10 @@ func QueryUser(uid int64) (*model.User, error) {
 	user := new(model.User)
 	err := global.MDB.Get(user, QueryUserStr, uid)
 	return user, err
+}
+
+func SearchUser(keyword string) ([]model.UserInfo, error) {
+	users := make([]model.UserInfo, 10)
+	err := global.MDB.Select(&users, SearchUserStr, "%"+keyword+"%", "%"+keyword+"%")
+	return users, err
 }

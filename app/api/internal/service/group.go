@@ -205,3 +205,7 @@ func LeaveGroup(uid, groupID int64) error {
 	}
 	return delUser(uid, groupID)
 }
+
+func SearchGroup(keyword string) ([]model.Group, error) {
+	return mysql.SearchGroup(keyword)
+}

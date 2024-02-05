@@ -15,6 +15,7 @@ const (
 	QueryUserSRInGroupStr = "SELECT status,role FROM `user_groups` WHERE group_id = ? AND user_id = ?"
 	ChangeMemberStatusStr = "UPDATE `user_groups` SET status = ? WHERE group_id = ? AND user_id = ?"
 	DeleteGroupUserStr    = "DELETE FROM `user_groups` WHERE group_id = ? AND user_id = ?"
+	SearchGroupStr        = "SELECT group_id,group_name,avatar,description,type,created_at FROM `groups` WHERE type = 'public' AND (group_name LIKE ? OR description LIKE ?) LIMIT 10"
 )
 
 func CreateGroup(g *model.ParamCreateGroup, url string, uid int64) (group *model.Group, err error) {
@@ -78,5 +79,11 @@ func ChangeMemberStatus(groupID, changeUserID int64, status string) (err error) 
 
 func DeleteGroupUser(groupID, uid int64) (err error) {
 	_, err = global.MDB.Exec(DeleteGroupUserStr, groupID, uid)
+	return
+}
+
+func SearchGroup(keyword string) (groups []model.Group, err error) {
+	groups = make([]model.Group, 10)
+	err = global.MDB.Select(&groups, SearchGroupStr, "%"+keyword+"%", "%"+keyword+"%")
 	return
 }
