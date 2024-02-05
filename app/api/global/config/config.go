@@ -5,4 +5,5 @@ type Config struct {
 	DatabaseConfig DatabaseConfig `mapstructure:"database" json:"database"`
 	ServerConfig   ServerConfig   `mapstructure:"server" json:"server"`
 	AuthConfig     AuthConfig     `mapstructure:"auth" json:"auth"`
+	FilterConfig   SenFilter      `mapstructure:"filter" json:"filter"`
 }

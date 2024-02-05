@@ -18,12 +18,12 @@ database:
     max_idle_conns: 10
     max_open_conns: 10
 
-    redis:
-      addr: localhost
-      port: 6379
-      username: root
-      password:
-      db: 0
+  redis:
+    addr: localhost
+    port: 3307
+    username: root
+    password:
+    db: 0
 
 server:
   host: localhost
@@ -33,3 +33,6 @@ auth:
   jwt:
     secret-key: "lanshan-chat"
     expires-time: 3600
+
+filter:
+  dict_path: "./manifest/default_dict.txt"
