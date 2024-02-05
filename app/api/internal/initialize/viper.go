@@ -17,5 +17,4 @@ func SetupViper() {
 	if err != nil {
 		panic("viper unmarshal config failed, err: " + err.Error())
 	}
-
 }

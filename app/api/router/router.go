@@ -34,6 +34,10 @@ func InitRouter() error {
 		private.DELETE("/groups/member", controller.KickFromGroup)
 		private.PUT("/groups/member", controller.ChangeMemberStatus)
 		private.DELETE("/groups/me", controller.LeaveGroup)
+		private.POST("/groups/message", controller.SendMessage)
+		private.PUT("/groups/message", controller.EditMessage)
+		private.DELETE("/groups/message", controller.DeleteMessage)
+		private.GET("/groups/message", controller.GetGroupMessage)
 	}
 	err := r.Run(":8080")
 	if err != nil {

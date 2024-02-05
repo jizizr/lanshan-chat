@@ -30,6 +30,7 @@ const (
 	CodePermissionDenied
 	CodeNotInEnum
 	CodeUserNotInGroup
+	CodeMessageNotExist
 )
 
 // database error
@@ -41,6 +42,9 @@ const (
 	CodeDBInviteUser
 	CodeDBChangeUser
 	CodeDBKickUser
+	CodeDBSendMessage
+	CodeDBDeleteMessage
+	CodeDBGetMessage
 )
 
 var codeMsgMap = map[RespCode]string{
@@ -76,6 +80,10 @@ var codeMsgMap = map[RespCode]string{
 	CodeNotInEnum:           "不在枚举中",
 	CodeDBChangeUser:        "数据库修改用户失败",
 	CodeDBKickUser:          "数据库踢出用户失败",
+	CodeDBSendMessage:       "数据库发送消息失败",
+	CodeDBDeleteMessage:     "数据库删除消息失败",
+	CodeMessageNotExist:     "消息不存在",
+	CodeDBGetMessage:        "数据库获取消息失败",
 }
 
 func (code RespCode) Msg() string {
