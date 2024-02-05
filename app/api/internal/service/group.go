@@ -16,6 +16,10 @@ func CreateGroup(g *model.ParamCreateGroup, url string, uid int64) error {
 	}
 	redis.CreateGroup(group)
 	redis.JoinGroup(uid, group.GroupID, 0, "admin", group.CreatedAt)
+	_, err = redis.GetMessageID(group.GroupID)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -41,11 +45,12 @@ func joinGroup(uid, groupID int64) (err error) {
 
 	t := time.Now()
 
-	// lastRead 应该是此时群组最后一条消息的id，这里先写为0
-	if err := mysql.JoinGroup(uid, groupID, 0, "member", t); err != nil {
+	// lastRead 应该是此时群组最后一条消息的id
+	lastRead, _ := GetGroupLastMessageID(groupID)
+	if err := mysql.JoinGroup(uid, groupID, lastRead, "member", t); err != nil {
 		return err
 	}
-	redis.JoinGroup(uid, groupID, 0, "member", t)
+	redis.JoinGroup(uid, groupID, lastRead, "member", t)
 	return nil
 }
 

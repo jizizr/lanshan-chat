@@ -201,3 +201,81 @@ func GetGroupMessage(c *gin.Context) {
 	}
 	RespSuccess(c, messages)
 }
+
+func ReadMessage(c *gin.Context) {
+	m := new(model.ParamReadMessage)
+	if err := c.ShouldBind(m); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if m.GroupID == 0 || m.LastRead == 0 {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	userID, ok := GetUID(c)
+	if !ok {
+		RespFailed(c, 400, consts.CodeServerBusy)
+		return
+	}
+	if err := service.ReadMessage(userID, m); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			RespFailed(c, 400, consts.CodeUserNotInGroup)
+		} else {
+			RespFailed(c, 500, consts.CodeDBCheckUser)
+			global.Logger.Error("read message failed", zap.Error(err))
+		}
+		return
+	}
+	RespSuccess(c, nil)
+}
+
+func GetLastRead(c *gin.Context) {
+	m := new(model.ParamGetLastMessageID)
+	if err := c.ShouldBind(m); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if m.GroupID == 0 {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	uid, ok := GetUID(c)
+	if !ok {
+		RespFailed(c, 400, consts.CodeServerBusy)
+		return
+	}
+	lastRead, err := service.GetLastRead(uid, m.GroupID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			RespFailed(c, 400, consts.CodeUserNotInGroup)
+		} else {
+			RespFailed(c, 500, consts.CodeDBCheckUser)
+			global.Logger.Error("get last read failed", zap.Error(err))
+		}
+		return
+	}
+	RespSuccess(c, &model.ApiMessageID{MessageID: lastRead})
+}
+
+func GetLastMessage(c *gin.Context) {
+	m := new(model.ParamGetLastMessageID)
+	if err := c.ShouldBind(m); err != nil {
+		RespFailed(c, 400, consts.CodeShouldBind)
+		return
+	}
+	if m.GroupID == 0 {
+		RespFailed(c, 400, consts.CodeParamEmpty)
+		return
+	}
+	lastID, err := service.GetGroupLastMessageID(m.GroupID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			RespFailed(c, 400, consts.CodeGroupNotExist)
+		} else {
+			RespFailed(c, 500, consts.CodeDBCheckUser)
+			global.Logger.Error("get last message failed", zap.Error(err))
+		}
+		return
+	}
+	RespSuccess(c, &model.ApiMessageID{MessageID: lastID})
+}

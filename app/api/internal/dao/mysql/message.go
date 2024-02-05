@@ -9,9 +9,13 @@ const (
 	SendMessageToGroupStr = `INSERT INTO group_message
     						(group_id, message_id, sender_id, reply_message_id, message, type, url, file_name, send_date)
     						VALUES (:group_id, :message_id, :sender_id, :reply_message_id, :message, :type, :url, :filename, :send_date)`
+
+	QueryLastMessageIDStr = "SELECT message_id FROM group_message WHERE group_id = ? ORDER BY message_id DESC LIMIT 1"
+
 	DeleteMessageFromGroupStr = "DELETE FROM group_message WHERE id = ?"
 	QuerySenderIDFromGroupStr = "SELECT id,sender_id FROM group_message WHERE group_id = ? AND message_id =? FOR UPDATE"
-	UpdateMessageStr          = `UPDATE group_message 
+
+	UpdateMessageStr = `UPDATE group_message 
 								 SET reply_message_id = :reply_message_id,
 								     message = :message,
 								     type = :type,
@@ -19,10 +23,14 @@ const (
 								     file_name = :filename,
 								     update_date = :send_date
 								     WHERE id = :id`
+
 	GetMessageStr = `SELECT group_id, message_id, sender_id, reply_message_id, message, type, url, file_name, send_date, update_date 
 					 FROM group_message 
 					 WHERE group_id = ? AND message_id > ?  
 					 ORDER BY message_id LIMIT ?`
+
+	QueryLastReadStr  = "SELECT last_read FROM user_groups WHERE group_id = ? AND user_id = ?"
+	UpdateLastReadStr = "UPDATE user_groups SET last_read = ? WHERE group_id = ? AND user_id = ?"
 )
 
 func SendMessageToGroup(param *model.ParamSendMessage) (id int64, err error) {
@@ -51,5 +59,20 @@ func UpdateMessage(param *model.ParamSendMessage) (err error) {
 
 func GetMessages(groupID, startID int64, limit int) (messages []model.Message, err error) {
 	err = global.MDB.Select(&messages, GetMessageStr, groupID, startID, limit)
+	return
+}
+
+func QueryLastRead(groupID, userID int64) (lastRead int64, err error) {
+	err = global.MDB.Get(&lastRead, QueryLastReadStr, groupID, userID)
+	return
+}
+
+func UpdateLastRead(groupID, userID, lastRead int64) (err error) {
+	_, err = global.MDB.Exec(UpdateLastReadStr, lastRead, groupID, userID)
+	return
+}
+
+func QueryLastMessageID(groupID int64) (messageID int64, err error) {
+	err = global.MDB.Get(&messageID, QueryLastMessageIDStr, groupID)
 	return
 }

@@ -29,6 +29,19 @@ type ParamGetMessage struct {
 	Limit   int   `json:"limit" form:"limit" db:"limit"`
 }
 
+type ParamReadMessage struct {
+	GroupID  int64 `json:"group_id" form:"group_id" db:"group_id"`
+	LastRead int64 `json:"last_read" form:"last_read" db:"last_read"`
+}
+
+type ParamGetLastMessageID struct {
+	GroupID int64 `json:"group_id" form:"group_id" db:"group_id"`
+}
+
+type ApiMessageID struct {
+	MessageID int64 `json:"message_id" form:"message_id" db:"message_id"`
+}
+
 type Message struct {
 	GroupID        int64        `json:"group_id" db:"group_id"`
 	MessageID      int64        `json:"message_id" db:"message_id"`
