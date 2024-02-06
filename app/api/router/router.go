@@ -19,7 +19,6 @@ func InitRouter() error {
 		public.GET("/users/availability", controller.CheckUsername)
 		public.GET("/search", controller.Search)
 	}
-	public.s
 	// 需要登录的接口
 	private := r.Group("")
 	private.Use(middleware.JwtAuth)
