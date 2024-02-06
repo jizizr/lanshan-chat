@@ -44,7 +44,8 @@
 
 缓存存储还是选型最普遍的redis
 
-<img src="https://raw.githubusercontent.com/gin-gonic/logo/master/color.png" alt="img" style="zoom:10%;" />
+<img width="159px" src="https://raw.githubusercontent.com/gin-gonic/logo/master/color.png">
+
 
 - [gin](https://gin-gonic.com/)
 
