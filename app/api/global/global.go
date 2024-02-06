@@ -6,6 +6,7 @@ import (
 	"github.com/sgoware/go-sensitive"
 	"go.uber.org/zap"
 	"lanshan_chat/app/api/global/config"
+	"lanshan_chat/app/api/global/wsmap"
 )
 
 var (
@@ -13,5 +14,6 @@ var (
 	Logger *zap.Logger
 	MDB    *sqlx.DB
 	RDB    *redis.Client
+	WSMap  *wsmap.WSMap
 	Filter *sensitive.Manager
 )

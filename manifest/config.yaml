@@ -32,7 +32,7 @@ server:
 auth:
   jwt:
     secret-key: "lanshan-chat"
-    expires-time: 3600
+    expires-time: 360000
 
 filter:
   dict_path: "./manifest/default_dict.txt"

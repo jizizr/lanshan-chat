@@ -1,6 +1,7 @@
 package service
 
 import (
+	"lanshan_chat/app/api/global/wsmap"
 	"lanshan_chat/app/api/internal/consts"
 	"lanshan_chat/app/api/internal/dao/mysql"
 	"lanshan_chat/app/api/internal/dao/redis"
@@ -35,6 +36,10 @@ func SendMessage(m *model.ParamSendMessage) (err error) {
 		return
 	}
 	redis.SetMessageUniqueID(m.GroupID, m.MessageID, m.ID, m.SenderID)
+	go Notify(m.GroupID, &wsmap.Update{
+		Action: "new",
+		Data:   m,
+	})
 	return
 }
 

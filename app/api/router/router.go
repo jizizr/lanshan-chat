@@ -19,7 +19,7 @@ func InitRouter() error {
 		public.GET("/users/availability", controller.CheckUsername)
 		public.GET("/search", controller.Search)
 	}
-
+	public.s
 	// 需要登录的接口
 	private := r.Group("")
 	private.Use(middleware.JwtAuth)
@@ -42,6 +42,7 @@ func InitRouter() error {
 		private.PUT("/groups/message", controller.EditMessage)
 		private.DELETE("/groups/message", controller.DeleteMessage)
 		private.GET("/groups/message", controller.GetGroupMessage)
+		private.GET("ws", websocketHandler)
 	}
 	err := r.Run(":8080")
 	if err != nil {

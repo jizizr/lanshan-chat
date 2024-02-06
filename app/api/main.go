@@ -12,6 +12,7 @@ func main() {
 	initialize.SetupViper()
 	initialize.SetupLogger()
 	initialize.SetupDataBase()
+	initialize.SetupMap()
 	initialize.SetupFilter()
 	config := global.Config.ServerConfig
 	gin.SetMode(config.Mode)
